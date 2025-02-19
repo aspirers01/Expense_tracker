@@ -5,12 +5,16 @@ import Button from '../components/UI/Button';
 import IconButton from '../components/UI/IconButton';
 import { GlobalStyles } from '../constants/styles';
 import { ExpensesContext } from '../store/expenses-context';
+import ExpenseForm from '../components/ManageExpense/ExpenseForm';
+import { storeExpense } from '../util/http';
 
 function ManageExpense({ route, navigation }) {
   const expensesCtx = useContext(ExpensesContext);
 
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
+  const selectedExpense = expensesCtx.expenses.find(expense => expense.id === editedExpenseId);
+
 
   useLayoutEffect(() => {
     navigation.setOptions({
@@ -27,36 +31,24 @@ function ManageExpense({ route, navigation }) {
     navigation.goBack();
   }
 
-  function confirmHandler() {
+  function confirmHandler(expenseData) {
     if (isEditing) {
-      expensesCtx.updateExpense(
-        editedExpenseId,
-        {
-          description: 'Test!!!!',
-          amount: 29.99,
-          date: new Date('2022-05-20'),
-        }
-      );
-    } else {
-      expensesCtx.addExpense({
-        description: 'Test',
-        amount: 19.99,
-        date: new Date('2022-05-19'),
-      });
+      expensesCtx.updateExpense(editedExpenseId, expenseData); 
+    } else { 
+        storeExpense(expenseData);
+      expensesCtx.addExpense(expenseData);
     }
     navigation.goBack();
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.buttons}>
-        <Button style={styles.button} mode="flat" onPress={cancelHandler}>
-          Cancel
-        </Button>
-        <Button style={styles.button} onPress={confirmHandler}>
-          {isEditing ? 'Update' : 'Add'}
-        </Button>
-      </View>
+    <View style={styles.container}> 
+    <ExpenseForm onCancle={cancelHandler} 
+    submitButtonLabel={isEditing ?'Update':'Add' } 
+     onSubmit={confirmHandler}
+     defaultValues={selectedExpense}
+     />
+     
       {isEditing && (
         <View style={styles.deleteContainer}>
           <IconButton
