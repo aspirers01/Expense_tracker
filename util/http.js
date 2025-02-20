@@ -1,13 +1,14 @@
  import axios from 'axios';
     const API_URL = 'https://expensemanger-6dcfb-default-rtdb.firebaseio.com/'; 
 
-export function storeExpense(expense) {
-    return axios.post(`${API_URL}/expenses.json`, expense);
-
+export async function storeExpense(expense) {
+    const response = axios.post(`${API_URL}/expenses.json`, expense);
+    const id= response.data.name;
+    return id;
  }
 
  export  async function fetchExpenses() {
-    const response = await axios.get(BACKEND_URL + '/expenses.json');
+    const response = await axios.get(API_URL + '/expenses.json');
 
     const expenses = [];
   
@@ -25,3 +26,11 @@ export function storeExpense(expense) {
         
     
  }
+
+ export async function updateExpense(Id, expense) {
+    return axios.put(`${API_URL}/expenses/${Id}.json`, expense);
+  }
+
+  export function deleteExpense(Id) {
+    return axios.delete(`${API_URL}/expenses/${Id}.json`);
+  }
